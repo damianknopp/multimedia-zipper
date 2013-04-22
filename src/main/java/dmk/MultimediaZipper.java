@@ -131,33 +131,37 @@ public class MultimediaZipper {
 		if(logger.isDebugEnabled()){
 			logger.debug("creating zip file " + tmpZip.getAbsolutePath());
 		}
-		for (final File file : files) {
-			FileInputStream in = null;
-			ZipOutputStream out = null;
-			try{
-			// read file
-			in = new FileInputStream(file);
+		ZipOutputStream out = null;
+		try{
 			// output file
 			out = new ZipOutputStream(new FileOutputStream(
 					tmpZip));
-			// name the file inside the zip file
-			final String entryName = file.getAbsolutePath();
-			if(logger.isDebugEnabled()){
-				logger.debug("adding entry name " + entryName);
-			}
-			out.putNextEntry(new ZipEntry(entryName));
-			byte[] b = new byte[1024];
-			int count;
-			while ((count = in.read(b)) > 0) {
-				out.write(b, 0, count);
-			}
-			}finally{
-				if(out != null){
-					out.close();
+			for (final File file : files) {
+
+				FileInputStream in = null;
+				// read file
+				try{
+					in = new FileInputStream(file);
+					// name the file inside the zip file
+					final String entryName = file.getName();
+					if(logger.isDebugEnabled()){
+						logger.debug("adding entry name " + entryName);
+					}
+					out.putNextEntry(new ZipEntry(entryName));
+					byte[] b = new byte[1024];
+					int count;
+					while ((count = in.read(b)) > 0) {
+						out.write(b, 0, count);
+					}
+				}finally{
+					if(in != null){
+						in.close();				
+					}
 				}
-				if(in != null){
-					in.close();				
-				}
+			}
+		}finally{
+			if(out != null){
+				out.close();
 			}
 		}
 		return tmpZip;
